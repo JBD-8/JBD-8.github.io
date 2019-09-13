@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+		<link rel="stylesheet" href="../css/style.css" />
+		<title> Cartographie </title>
+        <style>
+		#map {
+			width: 100%;
+			height: 20%;
+			margin-left: 0%;
+			border-style: solid; border-color: black; border-width: thin;
+			margin-right: 0%;
+			padding: 21%;
+			}
+html, body {
+    margin: 0;
+    height:20%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+header {
+  background-color: #5d7a98;
+  padding: 1px;
+  text-align: center;
+  font-size: 35px;
+  color: white;
+}
+section {
+  display: -webkit-flex;
+  display: flex;
+}
+nav {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 0.5;
+  background: #92a9c2;
+  padding: 10;
+}
+
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin-left: 10px;
+}
+
+article {
+  -webkit-flex: 3;
+  -ms-flex: 3;
+  flex: 3;
+  background-color: white;
+  padding: 1%;
+}
+footer {
+  background-color: #5d7a98;
+  padding: 1%;
+  text-align: center;
+  color: white;
+}
+@media (max-width: 600px) {
+  section {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+}
+	.leaflet-popup-content {
+		min-width: 275px;
+		<!-- min-height: 150px; -->
+	}
+
+        </style>
+    </head>
+    <body>
+	<header>
+  <h2>Cartographie interactive</h2>
+</header>
+<section>
+  <nav>
+    <ul>
+		<li>   </li>
+		<li><a href="../index.html">Accueil</a></li>
+		<li>   </li>
+		<li><a href="../projet.html">Le projet DURB</a></li>
+		<li>   </li>
+		<li><a href="../mesure.html">Mesurer la résidentialisation sur les littoraux</a></li>
+		<li>   </li>
+		<li><a href="../typologie.html">La construction de la typologie</a></li>
+		<li>   </li>
+		<li style="background-color: #008CBA;"><a href="index.html">Cartographie</a></li>
+    </ul>
+  </nav>
+  
+  <article>
+		<div id="map"; style="background-color: white"></div>
+  </article>
+</section>
+
+<footer>
+  <p style="text-align: center;">Projet DURB, financé par la Fondation de France</p>
+</footer>
+
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="data/n_com_fla_000_1.js"></script>
+        <script src="data/Couche_finale_typo_1.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString') {
+              highlightLayer.setStyle({
+                //color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                //fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+            highlightLayer.openPopup();
+        }
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:14, minZoom:6
+        }).fitBounds([[42.24713980436562,-7.1069660773133725],[51.431439297525216,17.20444879032328]]);
+        var hash = new L.Hash(map);
+		map.attributionControl.setPrefix('<a href="../index.html" target="Projet DURB">Projet DURB</a> &middot; <a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a>');
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        var layer_OpenStreetMap_0 = L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 1.0,
+            attribution: '',
+        });
+        layer_OpenStreetMap_0;
+        map.addLayer(layer_OpenStreetMap_0);
+        function pop_Couche_finale_typo_1(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (i in e.target._eventParents) {
+                        e.target._eventParents[i].resetStyle(e.target);
+                    }
+                    if (typeof layer.closePopup == 'function') {
+                        //layer.closePopup();
+                    } else {
+                        layer.eachLayer(function(feature){
+                            feature.closePopup()
+                        });
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row"></th>\
+                        <td>' + '<b> <font size="3%">' + (feature.properties['Nom'] !== null ? Autolinker.link(String(feature.properties['Nom'])) : '') + '</font></b>'  + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Classe</th>\
+                        <td>' + (feature.properties['Classe'] !== null ? Autolinker.link(String(feature.properties['Classe'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Intitulé</th>\
+                        <td>' + (feature.properties['Intitulé'] !== null ? Autolinker.link(String(feature.properties['Intitulé'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+						<th scope="row"> </th>\
+                        <td colspan="2">' + (feature.properties['Rapport'] !== null ? Autolinker.link(String(feature.properties['Rapport'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Couche_finale_typo_1_0(feature) {
+            switch(String(feature.properties['Intitulé'])) {
+                case 'Communes jeunes et en croissance démographique aux ressources fiscales résidentialisées':
+                    return {
+                pane: 'pane_Couche_finale_typo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.2, // Épaisseur de la bordure
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(239,239,24,1.0)',
+            }
+                    break;
+                case 'Communes littorales ou d\'arrière-pays touristiques et âgées aux ressources fiscalo- financières élevées et résidentialisées':
+                    return {
+                pane: 'pane_Couche_finale_typo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.2, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,157,0,1.0)',
+            }
+                    break;
+                case 'Communes rurales agricoles peu résidentialisées':
+                    return {
+                pane: 'pane_Couche_finale_typo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.2, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(8,183,83,1.0)',
+            }
+                    break;
+                case 'Communes rurales et périurbaines en croissance démographique et aux ressources fiscalo-financières limitées mais résidentialisées':
+                    return {
+                pane: 'pane_Couche_finale_typo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.2, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(247,176,231,1.0)',
+            }
+                    break;
+                case 'Communes rurales rajeunies aux resources fiscalo-financières limitées et peu résidentialisées':
+                    return {
+                pane: 'pane_Couche_finale_typo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.2, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(70,226,32,1.0)',
+            }
+                    break;
+                case 'Communes urbaines aux ressources fiscalo-financières élevées et productives':
+                    return {
+                pane: 'pane_Couche_finale_typo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.2, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(239,7,41,1.0)',
+            }
+                    break;
+                case 'Données manquantes':
+                    return {
+                pane: 'pane_Couche_finale_typo_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 0.2, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Couche_finale_typo_1');
+        map.getPane('pane_Couche_finale_typo_1').style.zIndex = 401;
+        map.getPane('pane_Couche_finale_typo_1').style['mix-blend-mode'] = 'normal';
+        var layer_Couche_finale_typo_1 = new L.geoJson(json_Couche_finale_typo_1, {
+            attribution: '',
+            pane: 'pane_Couche_finale_typo_1',
+            onEachFeature: pop_Couche_finale_typo_1,
+            style: style_Couche_finale_typo_1_0,
+        });
+        bounds_group.addLayer(layer_Couche_finale_typo_1);
+        map.addLayer(layer_Couche_finale_typo_1);
+        setBounds();
+        map.addControl(new L.Control.Search({
+            layer: layer_Couche_finale_typo_1,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'Nom'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-search ';
+        </script>
+    </body>
+</html>

@@ -1,0 +1,113 @@
+			html, body {
+    margin: 0;
+    height: 100%;
+}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Style the header */
+header {
+  background-color: #5d7a98;
+  padding: 5px;
+  text-align: center;
+  font-size: 35px;
+  color: white;
+}
+
+header h2 {
+	font-size: 25px;
+}
+
+/* Container for flexboxes */
+section {
+  display: -webkit-flex;
+  display: flex;
+}
+
+/* Style the navigation menu */
+nav {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 0.5;
+  background: #92a9c2;
+}
+
+/* Style the list inside the menu */
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin-left: 10px;
+}
+
+/* Style the content */
+article {
+  -webkit-flex: 3;
+  -ms-flex: 3;
+  flex: 3;
+  background-color: white;
+  padding: 5px;
+}
+
+/* Style the footer */
+footer {
+  background-color: #5d7a98;
+  padding: 10px;
+  text-align: center;
+  color: white;
+}
+
+p {
+	font-family: "Calibri", Times, serif;
+
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 13%;	
+  background-color: #92a9c2;
+  position: fixed; /* Make it stick, even on scroll */
+  overflow: auto; /* Enable scrolling if the sidenav has too much content */
+  font-size: 15pt;
+}
+
+li a {
+  width: 100%;
+  display: block;
+  color: #000;
+  padding: 8px 16px;
+  border: 1px solid #555;
+  text-decoration: none;
+  text-align:center
+}
+
+/* Change the link color on hover */
+li a:hover {
+  background-color: #555;
+  color: white;
+}
+h1 {
+	font-size: 25pt;
+}
+
+h2 {
+	font-size: 16pt;
+}
+
+nav a {
+	color: white;
+}
+
+/* Responsive layout - makes the menu and the content (inside the section) sit on top of each other instead of next to each other */
+@media (max-width: 600px) {
+  section {
+    -webkit-flex-direction: column;
+    flex-direction: column;
+  }
+}

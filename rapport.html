@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+		<meta charset="utf-8" >
+		<link rel="stylesheet" href="css/style.css" />
+		<script src="https://www.chartjs.org/dist/2.8.0/Chart.min.js"></script>
+		<script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+		<script src="cartographie/data/Couche_de_base_typo_1.js"></script>
+		<script src="cartographie/data/testdata.js"></script>
+		<title> Rapport communal </title>
+        <style>
+canvas {
+		-moz-user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+	}
+button {
+	background-color: #008CBA;
+	border: solid;
+	color: white;
+	padding: 8px 12px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 14px;
+	border-radius: 4px;
+}
+        </style>
+    </head>
+	<body>
+		<header>
+  <h2>Projet DURB</h2>
+</header>
+
+<section>
+  <nav>
+    <ul>
+		<li><a href="index.html">Accueil</a></li>
+		<li>   </li>
+		<li><a href="donnees.html">Le projet DURB</a></li>
+		<li>   </li>
+		<li><a href="typologie.html">Mesurer la résidentialisation sur les littoraux</a></li>
+		<li>   </li>
+		<li><a href="resultats.html">La construction de la typologie</a></li>
+		<li>   </li>
+		<li><a href="cartographie/index.html">Cartographie</a></li>
+		<li>   </li>
+		<li><a href="rapport.html">Rapport communal</a><li>
+    </ul>
+  </nav>
+  
+  <article>
+    <h1>Rapport communal</h1>
+	<div style="width: 75%">
+		<canvas id="canvas"></canvas>
+	</div>
+  <div>
+    <label for="code_insee">Veuillez entrer le code INSEE de la commune :</label>
+    <input type="text" id="code_insee" name="name">
+  </div>
+  <div>
+    <button onclick="getcode()">Valider code INSEE</button>
+  </div>
+	<button id="testRap"> Valeurs aléatoires </button>
+	<button id="faireValeur" onclick="valeurPop(); nomPop()"> Population </button>
+	<button id="faireValeur" onclick="valeurArtif(); nomArtif()"> Artificialisation </button>
+	  <script type="text/javascript"> // Cette fonction récupère l'index de la commune dans le tableau de données, afin d'en récupérer ensuite les données
+    var code = "Erreur";
+	var indexcom = "Erreur";
+	var nomcom = "Erreur";
+    function getcode(){  
+	nomcom = "Erreur";
+	indexcom = "Commune Inconnue";
+    code=document.getElementById("code_insee").value;  
+	for( i = 0; i < json_Couche_de_base_typo_1.features.length; i += 1) { // Parcourt le tableau de données pour récupérer l'index de l'entité correspondant au code INSEE
+        if(json_Couche_de_base_typo_1.features[i].properties.insee_comm === code) {
+            indexcom = i;
+        }
+    }
+	if(indexcom === "Commune Inconnue") { 
+		alert('Commune inconnue, veuillez réessayer');
+	};
+	nomcom = json_Couche_de_base_typo_1.features[indexcom].properties.Nom;
+	alert(`Rapport pour la commune de ${nomcom}`);
+    }
+	  </script>
+	<script>
+		var barChartData = {
+			labels: ['1999', '2010', '2016'],
+			datasets: [{
+				label: 'Commune',
+				backgroundColor: window.chartColors.red,
+				stack: 'Stack 0',
+				data: [
+					getRandomInt(60,5550),
+					getRandomInt(60,5550),
+					getRandomInt(60,5550)
+				]
+			}, {
+				label: 'Moyenne EPCI',
+				backgroundColor: window.chartColors.orange,
+				stack: 'Stack 1',
+				data: [
+					getRandomInt(60,5550),
+					getRandomInt(60,5550),
+					getRandomInt(60,5550)
+				]
+			}, 
+			{
+				label: 'Moyenne Departement',
+				backgroundColor: window.chartColors.yellow,
+				stack: 'Stack 2',
+				data: [
+					getRandomInt(60,5550),
+					getRandomInt(60,5550),
+					getRandomInt(60,5550)
+				]
+			},{
+				label: ' Moyenne Façade Littorale',
+				backgroundColor: window.chartColors.blue,
+				stack: 'Stack 3',
+				data: [
+					getRandomInt(60,5550),
+					getRandomInt(60,5550),
+					getRandomInt(60,5550)
+				]
+			},
+			{
+				label: 'Moyenne France',
+				backgroundColor: window.chartColors.green,
+				stack: 'Stack 4',
+				data: [
+					getRandomInt(60,5550),
+					getRandomInt(60,5550),
+					getRandomInt(60,5550)
+				]
+			}]
+
+		};
+		
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myBar = new Chart(ctx, {
+				type: 'bar',
+				data: barChartData,
+				options: {
+					title: {
+						display: true,
+						text: 'Valeurs aléatoires',
+						fontSize: 16
+					},
+					tooltips: {
+						mode: 'index',
+						intersect: false
+					},
+					responsive: true,
+					scales: {
+						xAxes: [{
+							stacked: true,
+						}],
+						yAxes: [{
+							stacked: true
+						}]
+					}
+				}
+			});
+		};
+
+		document.getElementById('testRap').addEventListener('click', function() { // Premier Test du rapport, affiche la population de 1999 pour la commune correspondant au code INSEE
+			barChartData.datasets.forEach(function(dataset) {
+				dataset.data = dataset.data.map(function() {
+						return getRandomInt(60,5550);
+				});
+			});
+			//barChartData.datasets[0].label = json_Couche_de_base_typo_1.features[indexcom].properties.Libellé;
+			//barChartData.datasets[1].label = "Moyenne " + json_Couche_de_base_typo_1.features[indexcom].properties.nom_epci;
+			//barChartData.datasets[2].label = "Moyenne " + json_Couche_de_base_typo_1.features[indexcom].properties.Dpt;
+			window.myBar.options.title.text = 'Valeurs aléatoires';
+			window.myBar.update();
+		});
+		
+		function valeurPop() { // Affiche les valeurs de population pour les 3 dates concernées
+			var nouvelleData = [json_Couche_de_base_typo_1.features[indexcom].properties.Pop_1999, json_Couche_de_base_typo_1.features[indexcom].properties.Pop_2010, json_Couche_de_base_typo_1.features[indexcom].properties.Pop_2015]; // Création d'un tableau qui stocke les valeurs de population
+			var epci = [getRandomInt(60,5550), getRandomInt(60,5550), getRandomInt(60,5500)]
+			var depart = [getRandomInt(60,5550), getRandomInt(60,5550), getRandomInt(60,5500)]
+			var lito = [getRandomInt(60,5550), getRandomInt(60,5550), getRandomInt(60,5500)]
+			var francemoy = [getRandomInt(60,5550), getRandomInt(60,5550), getRandomInt(60,5500)]
+			barChartData.datasets[0].data = nouvelleData; // Remplacement des données de base par les données de population 
+			barChartData.datasets[1].data = epci;
+			barChartData.datasets[2].data = depart;
+			barChartData.datasets[3].data = lito;
+			barChartData.datasets[4].data = francemoy;
+			barChartData.labels = ['1999', '2010', '2016'];
+			window.myBar.update();
+		}
+		
+		function nomPop() { // Changement du nom du graphique
+			window.myBar.options.title.text = 'Évolution de la population pour la commune de ' + json_Couche_de_base_typo_1.features[indexcom].properties.Libellé;
+			barChartData.datasets[0].label = json_Couche_de_base_typo_1.features[indexcom].properties.Libellé;
+			barChartData.datasets[1].label = "Moyenne " + json_Couche_de_base_typo_1.features[indexcom].properties.nom_epci;
+			barChartData.datasets[2].label = "Moyenne " + json_Couche_de_base_typo_1.features[indexcom].properties.Dpt;
+			window.myBar.update();
+		}
+		
+		function valeurArtif() { // Affiche les valeurs de l'artificialisation pour les 3 dates concernées
+			var nouvelleData = [getRandomInt(0,40), getRandomInt(0,40), getRandomInt(0,40)]; // Création d'un tableau qui stocke les valeurs de population
+			var epci = [getRandomInt(0,40), getRandomInt(0,40), getRandomInt(0,40)]
+			var depart = [getRandomInt(0,40), getRandomInt(0,40), getRandomInt(0,40)]
+			var lito = [getRandomInt(0,40), getRandomInt(0,40), getRandomInt(0,40)]
+			var francemoy = [getRandomInt(0,40), getRandomInt(0,40), getRandomInt(0,40)]
+			barChartData.datasets[0].data = nouvelleData; // Remplacement des données de base par les données de population 
+			barChartData.datasets[1].data = epci;
+			barChartData.datasets[2].data = depart;
+			barChartData.datasets[3].data = lito;
+			barChartData.datasets[4].data = francemoy;
+			barChartData.labels = ['1999', '2006', '2012'];
+			window.myBar.update();
+		}
+		
+		function nomArtif() { // Changement du nom du graphique
+			window.myBar.options.title.text = "Évolution de l'artificialisation pour la commune de " + json_Couche_de_base_typo_1.features[indexcom].properties.Libellé;
+			barChartData.datasets[0].label = json_Couche_de_base_typo_1.features[indexcom].properties.Libellé;
+			barChartData.datasets[1].label = "Moyenne " + json_Couche_de_base_typo_1.features[indexcom].properties.nom_epci;
+			barChartData.datasets[2].label = "Moyenne " + json_Couche_de_base_typo_1.features[indexcom].properties.Dpt;
+			window.myBar.update();
+		}
+		
+		
+		function getRandomInt(min, max) { // Génère des valeurs aléatoires entières
+			min = Math.ceil(min);
+			max = Math.floor(max);
+			return Math.floor(Math.random() * (max - min)) + min;
+		}
+	</script>
+  </article>
+</section>
+
+<footer>
+  <p>Projet DURB, financé par la Fondation de France</p>
+</footer>
+
+	</body>
